@@ -328,6 +328,34 @@ app.post("/api/notifications", async (req, res) => {
 });
 
 
+app.put("/api/notifications/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isRead } = req.body;
+
+    const notification = await prisma.notification.update({
+      where: {
+        id,
+      },
+      data: {
+        isRead: isRead ?? true,
+      },
+      include: {
+        task: true,
+      },
+    });
+
+    res.json(notification);
+  } catch (error) {
+    console.error("Failed to update notification:", error);
+
+    res.status(500).json({
+      message: "Failed to update notification",
+    });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });

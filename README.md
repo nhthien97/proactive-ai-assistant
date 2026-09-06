@@ -1,36 +1,23 @@
-# proactive-ai-assistant
-Trợ lý AI cá nhân chủ động dựa trên ngữ cảnh người dùng, hỗ trợ phát hiện công việc, rủi ro và đưa ra đề xuất phù hợp.
+Đã hoàn thiện nền tảng hệ thống gồm Frontend React + Vite, Backend Node.js + Express, REST API, Prisma ORM và PostgreSQL trên Render. Đã xây dựng database gồm User, Source, PersonalContext, Task và Notification; thực hiện migration và kết nối thành công. Frontend đã kết nối API và hiển thị dữ liệu thật. Hoàn thành các chức năng tạo/cập nhật Task, tạo và đánh dấu Notification đã đọc, đồng thời kiểm tra dữ liệu trực tiếp bằng pgAdmin. Giai đoạn tiếp theo tập trung xây dựng AI phân tích Personal Context và cơ chế trợ lý chủ động.
 
-1. Khởi tạo mã nguồn
-Tạo GitHub Repository: proactive-ai-assistant.
-Tạo và sử dụng GitHub Codespaces để phát triển dự án.
-Khởi tạo cấu trúc:
-frontend/
-backend/
-docs/
-2. Xây dựng Frontend
-Công nghệ: React + Vite + JavaScript.
-Khởi tạo React:
-npm create vite@latest . -- --template react
-Cài đặt thư viện:
-npm install
-npm install axios
-Sử dụng Axios để gọi API từ Frontend.
-3. Xây dựng Backend
-Công nghệ: Node.js + Express.
-Khởi tạo Backend:
-npm init -y
-Cài đặt:
-npm install express cors dotenv
-npm install -D nodemon
-Xây dựng API kiểm tra trạng thái:
-GET /api/health
-Backend chạy trên Port 5000.
-4. Kết nối Frontend và Backend
-Thiết lập Vite Proxy để React có thể gọi API Backend.
-Cấu hình Axios sử dụng:
-/api
-Kiểm tra kết nối bằng:
+
+Các lệnh quan trọng đã sử dụng
+Chạy Backend
+cd backend
+node src.js
+Chạy Frontend
+cd frontend
+npm run dev
+Prisma
+npx prisma validate
+npx prisma migrate dev --name init
+npx prisma migrate status
+npx prisma generate
+npx prisma studio
+Kiểm tra API
 curl http://localhost:5000/api/health
-curl http://localhost:5174/api/health
-Kết quả: Frontend ↔ Backend kết nối thành công. ✅
+curl http://localhost:5000/api/users
+curl http://localhost:5000/api/contexts
+curl http://localhost:5000/api/tasks
+curl http://localhost:5000/api/notifications
+curl http://localhost:5000/api/sources
