@@ -1,9 +1,15 @@
 import express from "express";
 import cors from "cors";
 import prisma from "./src/prisma.js";
+import { GoogleGenAI } from "@google/genai";
+import "dotenv/config";
 
 const app = express();
 const PORT = 5000;
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 app.use(cors());
 app.use(express.json());
@@ -355,6 +361,236 @@ app.put("/api/notifications/:id", async (req, res) => {
   }
 });
 
+
+// =========================
+// AI ANALYSIS
+// =========================
+app.post("/api/ai/analyze-context", async (req, res) => {
+  try {
+    const { contextId } = req.body;
+
+    if (!contextId) {
+      return res.status(400).json({
+        error: "contextId is required",
+      });
+    }
+
+    // 1. Lấy PersonalContext từ PostgreSQL
+    const context = await prisma.personalContext.findUnique({
+      where: {
+        id: contextId,
+      },
+      include: {
+        source: true,
+      },
+    });
+
+    if (!context) {
+      return res.status(404).json({
+        error: "Context not found",
+      });
+    }
+
+    // 2. Tạo prompt gửi cho Gemini
+    const prompt = `
+Bạn là AI phân tích ngữ cảnh cho một trợ lý AI cá nhân chủ động.
+
+Hãy phân tích PersonalContext sau:
+
+ID: ${context.id}
+Loại ngữ cảnh: ${context.type}
+Nội dung: ${context.content}
+Mức độ quan trọng: ${context.importance}/5
+Nguồn: ${context.source?.name || "Không xác định"}
+
+Hãy trả về DUY NHẤT một JSON hợp lệ theo cấu trúc:
+
+{
+  "summary": "Tóm tắt ngắn gọn ngữ cảnh",
+  "category": "schedule|task|deadline|reminder|information|other",
+  "importance": 1,
+  "needsAction": true,
+  "actionType": "task|notification|recommendation|none",
+  "suggestedTask": {
+    "title": "Tên công việc được đề xuất",
+    "description": "Mô tả công việc",
+    "priority": "low|medium|high",
+    "dueDate": null
+  },
+  "risk": null,
+  "recommendation": null
+}
+
+Quy tắc:
+- importance phải là số nguyên từ 1 đến 5.
+- needsAction là true hoặc false.
+- actionType chỉ được là: task, notification, recommendation hoặc none.
+- Nếu không cần tạo task thì suggestedTask phải là null.
+- Nếu không phát hiện rủi ro thì risk phải là null.
+- Nếu không có đề xuất thì recommendation phải là null.
+- Không thêm Markdown.
+- Không thêm Markdown code block.
+- Chỉ trả về JSON.
+`;
+
+    // 3. Gọi Gemini
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
+
+    // 4. Lấy nội dung Gemini trả về
+    const text = response.text?.trim();
+
+    if (!text) {
+      return res.status(500).json({
+        error: "Gemini returned an empty response",
+      });
+    }
+
+    // 5. Parse JSON từ Gemini
+    let analysis;
+
+    try {
+      analysis = JSON.parse(text);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini response:", text);
+
+      return res.status(500).json({
+        error: "Gemini returned invalid JSON",
+        rawResponse: text,
+      });
+    }
+
+    // 6. Trả kết quả về frontend
+    return res.json({
+      contextId: context.id,
+      analysis,
+    });
+  } catch (error) {
+    console.error("AI analysis error:", error);
+
+    return res.status(500).json({
+      error: "Failed to analyze context",
+      details: error.message,
+    });
+  }
+});
+
+// =========================
+// AI ANALYSIS
+// =========================
+app.post("/api/ai/analyze-context", async (req, res) => {
+  try {
+    const { contextId } = req.body;
+
+    if (!contextId) {
+      return res.status(400).json({
+        error: "contextId is required",
+      });
+    }
+
+    // 1. Lấy PersonalContext từ PostgreSQL
+    const context = await prisma.personalContext.findUnique({
+      where: {
+        id: contextId,
+      },
+      include: {
+        source: true,
+      },
+    });
+
+    if (!context) {
+      return res.status(404).json({
+        error: "Context not found",
+      });
+    }
+
+    // 2. Tạo prompt gửi cho Gemini
+    const prompt = `
+Bạn là AI phân tích ngữ cảnh cho một trợ lý AI cá nhân chủ động.
+
+Hãy phân tích PersonalContext sau:
+
+ID: ${context.id}
+Loại ngữ cảnh: ${context.type}
+Nội dung: ${context.content}
+Mức độ quan trọng: ${context.importance}/5
+Nguồn: ${context.source?.name || "Không xác định"}
+
+Hãy trả về DUY NHẤT một JSON hợp lệ theo cấu trúc:
+
+{
+  "summary": "Tóm tắt ngắn gọn ngữ cảnh",
+  "category": "schedule|task|deadline|reminder|information|other",
+  "importance": 1,
+  "needsAction": true,
+  "actionType": "task|notification|recommendation|none",
+  "suggestedTask": {
+    "title": "Tên công việc được đề xuất",
+    "description": "Mô tả công việc",
+    "priority": "low|medium|high",
+    "dueDate": null
+  },
+  "risk": null,
+  "recommendation": null
+}
+
+Quy tắc:
+- importance phải là số nguyên từ 1 đến 5.
+- needsAction là true hoặc false.
+- actionType chỉ được là: task, notification, recommendation hoặc none.
+- Nếu không cần tạo task thì suggestedTask phải là null.
+- Nếu không phát hiện rủi ro thì risk phải là null.
+- Nếu không có đề xuất thì recommendation phải là null.
+- Không thêm Markdown.
+- Không thêm Markdown code block.
+- Chỉ trả về JSON.
+`;
+
+    // 3. Gọi Gemini
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
+
+    // 4. Lấy nội dung Gemini trả về
+    const text = response.text?.trim();
+
+    if (!text) {
+      return res.status(500).json({
+        error: "Gemini returned an empty response",
+      });
+    }
+
+    // 5. Parse JSON từ Gemini
+    let analysis;
+
+    try {
+      analysis = JSON.parse(text);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini response:", text);
+
+      return res.status(500).json({
+        error: "Gemini returned invalid JSON",
+        rawResponse: text,
+      });
+    }
+
+    // 6. Trả kết quả về frontend
+    return res.json({
+      contextId: context.id,
+      analysis,
+    });
+  } catch (error) {
+    console.error("AI analysis error:", error);
+
+    return res.status(500).json({
+      error: "Failed to analyze context",
+      details: error.message,
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
