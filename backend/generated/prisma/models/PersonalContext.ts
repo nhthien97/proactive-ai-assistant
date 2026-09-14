@@ -243,6 +243,7 @@ export type PersonalContextWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   source?: Prisma.XOR<Prisma.SourceNullableScalarRelationFilter, Prisma.SourceWhereInput> | null
   tasks?: Prisma.TaskListRelationFilter
+  aiInsights?: Prisma.AIInsightListRelationFilter
 }
 
 export type PersonalContextOrderByWithRelationInput = {
@@ -257,6 +258,7 @@ export type PersonalContextOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   source?: Prisma.SourceOrderByWithRelationInput
   tasks?: Prisma.TaskOrderByRelationAggregateInput
+  aiInsights?: Prisma.AIInsightOrderByRelationAggregateInput
 }
 
 export type PersonalContextWhereUniqueInput = Prisma.AtLeast<{
@@ -274,6 +276,7 @@ export type PersonalContextWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   source?: Prisma.XOR<Prisma.SourceNullableScalarRelationFilter, Prisma.SourceWhereInput> | null
   tasks?: Prisma.TaskListRelationFilter
+  aiInsights?: Prisma.AIInsightListRelationFilter
 }, "id">
 
 export type PersonalContextOrderByWithAggregationInput = {
@@ -316,6 +319,7 @@ export type PersonalContextCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutContextsInput
   source?: Prisma.SourceCreateNestedOneWithoutContextsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutContextInput
+  aiInsights?: Prisma.AIInsightCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextUncheckedCreateInput = {
@@ -328,6 +332,7 @@ export type PersonalContextUncheckedCreateInput = {
   userId: string
   sourceId?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutContextInput
+  aiInsights?: Prisma.AIInsightUncheckedCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextUpdateInput = {
@@ -340,6 +345,7 @@ export type PersonalContextUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutContextsNestedInput
   source?: Prisma.SourceUpdateOneWithoutContextsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutContextNestedInput
+  aiInsights?: Prisma.AIInsightUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextUncheckedUpdateInput = {
@@ -352,6 +358,7 @@ export type PersonalContextUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutContextNestedInput
+  aiInsights?: Prisma.AIInsightUncheckedUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextCreateManyInput = {
@@ -439,6 +446,11 @@ export type PersonalContextSumOrderByAggregateInput = {
 export type PersonalContextNullableScalarRelationFilter = {
   is?: Prisma.PersonalContextWhereInput | null
   isNot?: Prisma.PersonalContextWhereInput | null
+}
+
+export type PersonalContextScalarRelationFilter = {
+  is?: Prisma.PersonalContextWhereInput
+  isNot?: Prisma.PersonalContextWhereInput
 }
 
 export type PersonalContextCreateNestedManyWithoutUserInput = {
@@ -549,6 +561,20 @@ export type PersonalContextUpdateOneWithoutTasksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PersonalContextUpdateToOneWithWhereWithoutTasksInput, Prisma.PersonalContextUpdateWithoutTasksInput>, Prisma.PersonalContextUncheckedUpdateWithoutTasksInput>
 }
 
+export type PersonalContextCreateNestedOneWithoutAiInsightsInput = {
+  create?: Prisma.XOR<Prisma.PersonalContextCreateWithoutAiInsightsInput, Prisma.PersonalContextUncheckedCreateWithoutAiInsightsInput>
+  connectOrCreate?: Prisma.PersonalContextCreateOrConnectWithoutAiInsightsInput
+  connect?: Prisma.PersonalContextWhereUniqueInput
+}
+
+export type PersonalContextUpdateOneRequiredWithoutAiInsightsNestedInput = {
+  create?: Prisma.XOR<Prisma.PersonalContextCreateWithoutAiInsightsInput, Prisma.PersonalContextUncheckedCreateWithoutAiInsightsInput>
+  connectOrCreate?: Prisma.PersonalContextCreateOrConnectWithoutAiInsightsInput
+  upsert?: Prisma.PersonalContextUpsertWithoutAiInsightsInput
+  connect?: Prisma.PersonalContextWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PersonalContextUpdateToOneWithWhereWithoutAiInsightsInput, Prisma.PersonalContextUpdateWithoutAiInsightsInput>, Prisma.PersonalContextUncheckedUpdateWithoutAiInsightsInput>
+}
+
 export type PersonalContextCreateWithoutUserInput = {
   id?: string
   type: string
@@ -558,6 +584,7 @@ export type PersonalContextCreateWithoutUserInput = {
   updatedAt?: Date | string
   source?: Prisma.SourceCreateNestedOneWithoutContextsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutContextInput
+  aiInsights?: Prisma.AIInsightCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextUncheckedCreateWithoutUserInput = {
@@ -569,6 +596,7 @@ export type PersonalContextUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   sourceId?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutContextInput
+  aiInsights?: Prisma.AIInsightUncheckedCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextCreateOrConnectWithoutUserInput = {
@@ -620,6 +648,7 @@ export type PersonalContextCreateWithoutSourceInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutContextsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutContextInput
+  aiInsights?: Prisma.AIInsightCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextUncheckedCreateWithoutSourceInput = {
@@ -631,6 +660,7 @@ export type PersonalContextUncheckedCreateWithoutSourceInput = {
   updatedAt?: Date | string
   userId: string
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutContextInput
+  aiInsights?: Prisma.AIInsightUncheckedCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextCreateOrConnectWithoutSourceInput = {
@@ -668,6 +698,7 @@ export type PersonalContextCreateWithoutTasksInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutContextsInput
   source?: Prisma.SourceCreateNestedOneWithoutContextsInput
+  aiInsights?: Prisma.AIInsightCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextUncheckedCreateWithoutTasksInput = {
@@ -679,6 +710,7 @@ export type PersonalContextUncheckedCreateWithoutTasksInput = {
   updatedAt?: Date | string
   userId: string
   sourceId?: string | null
+  aiInsights?: Prisma.AIInsightUncheckedCreateNestedManyWithoutContextInput
 }
 
 export type PersonalContextCreateOrConnectWithoutTasksInput = {
@@ -706,6 +738,7 @@ export type PersonalContextUpdateWithoutTasksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutContextsNestedInput
   source?: Prisma.SourceUpdateOneWithoutContextsNestedInput
+  aiInsights?: Prisma.AIInsightUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextUncheckedUpdateWithoutTasksInput = {
@@ -717,6 +750,71 @@ export type PersonalContextUncheckedUpdateWithoutTasksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aiInsights?: Prisma.AIInsightUncheckedUpdateManyWithoutContextNestedInput
+}
+
+export type PersonalContextCreateWithoutAiInsightsInput = {
+  id?: string
+  type: string
+  content: string
+  importance?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutContextsInput
+  source?: Prisma.SourceCreateNestedOneWithoutContextsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutContextInput
+}
+
+export type PersonalContextUncheckedCreateWithoutAiInsightsInput = {
+  id?: string
+  type: string
+  content: string
+  importance?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userId: string
+  sourceId?: string | null
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutContextInput
+}
+
+export type PersonalContextCreateOrConnectWithoutAiInsightsInput = {
+  where: Prisma.PersonalContextWhereUniqueInput
+  create: Prisma.XOR<Prisma.PersonalContextCreateWithoutAiInsightsInput, Prisma.PersonalContextUncheckedCreateWithoutAiInsightsInput>
+}
+
+export type PersonalContextUpsertWithoutAiInsightsInput = {
+  update: Prisma.XOR<Prisma.PersonalContextUpdateWithoutAiInsightsInput, Prisma.PersonalContextUncheckedUpdateWithoutAiInsightsInput>
+  create: Prisma.XOR<Prisma.PersonalContextCreateWithoutAiInsightsInput, Prisma.PersonalContextUncheckedCreateWithoutAiInsightsInput>
+  where?: Prisma.PersonalContextWhereInput
+}
+
+export type PersonalContextUpdateToOneWithWhereWithoutAiInsightsInput = {
+  where?: Prisma.PersonalContextWhereInput
+  data: Prisma.XOR<Prisma.PersonalContextUpdateWithoutAiInsightsInput, Prisma.PersonalContextUncheckedUpdateWithoutAiInsightsInput>
+}
+
+export type PersonalContextUpdateWithoutAiInsightsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  importance?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutContextsNestedInput
+  source?: Prisma.SourceUpdateOneWithoutContextsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutContextNestedInput
+}
+
+export type PersonalContextUncheckedUpdateWithoutAiInsightsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  importance?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextCreateManyUserInput = {
@@ -738,6 +836,7 @@ export type PersonalContextUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   source?: Prisma.SourceUpdateOneWithoutContextsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutContextNestedInput
+  aiInsights?: Prisma.AIInsightUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextUncheckedUpdateWithoutUserInput = {
@@ -749,6 +848,7 @@ export type PersonalContextUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutContextNestedInput
+  aiInsights?: Prisma.AIInsightUncheckedUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextUncheckedUpdateManyWithoutUserInput = {
@@ -780,6 +880,7 @@ export type PersonalContextUpdateWithoutSourceInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutContextsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutContextNestedInput
+  aiInsights?: Prisma.AIInsightUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextUncheckedUpdateWithoutSourceInput = {
@@ -791,6 +892,7 @@ export type PersonalContextUncheckedUpdateWithoutSourceInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutContextNestedInput
+  aiInsights?: Prisma.AIInsightUncheckedUpdateManyWithoutContextNestedInput
 }
 
 export type PersonalContextUncheckedUpdateManyWithoutSourceInput = {
@@ -810,10 +912,12 @@ export type PersonalContextUncheckedUpdateManyWithoutSourceInput = {
 
 export type PersonalContextCountOutputType = {
   tasks: number
+  aiInsights: number
 }
 
 export type PersonalContextCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tasks?: boolean | PersonalContextCountOutputTypeCountTasksArgs
+  aiInsights?: boolean | PersonalContextCountOutputTypeCountAiInsightsArgs
 }
 
 /**
@@ -833,6 +937,13 @@ export type PersonalContextCountOutputTypeCountTasksArgs<ExtArgs extends runtime
   where?: Prisma.TaskWhereInput
 }
 
+/**
+ * PersonalContextCountOutputType without action
+ */
+export type PersonalContextCountOutputTypeCountAiInsightsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AIInsightWhereInput
+}
+
 
 export type PersonalContextSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -846,6 +957,7 @@ export type PersonalContextSelect<ExtArgs extends runtime.Types.Extensions.Inter
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   source?: boolean | Prisma.PersonalContext$sourceArgs<ExtArgs>
   tasks?: boolean | Prisma.PersonalContext$tasksArgs<ExtArgs>
+  aiInsights?: boolean | Prisma.PersonalContext$aiInsightsArgs<ExtArgs>
   _count?: boolean | Prisma.PersonalContextCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["personalContext"]>
 
@@ -891,6 +1003,7 @@ export type PersonalContextInclude<ExtArgs extends runtime.Types.Extensions.Inte
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   source?: boolean | Prisma.PersonalContext$sourceArgs<ExtArgs>
   tasks?: boolean | Prisma.PersonalContext$tasksArgs<ExtArgs>
+  aiInsights?: boolean | Prisma.PersonalContext$aiInsightsArgs<ExtArgs>
   _count?: boolean | Prisma.PersonalContextCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PersonalContextIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -908,6 +1021,7 @@ export type $PersonalContextPayload<ExtArgs extends runtime.Types.Extensions.Int
     user: Prisma.$UserPayload<ExtArgs>
     source: Prisma.$SourcePayload<ExtArgs> | null
     tasks: Prisma.$TaskPayload<ExtArgs>[]
+    aiInsights: Prisma.$AIInsightPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1315,6 +1429,7 @@ export interface Prisma__PersonalContextClient<T, Null = never, ExtArgs extends 
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   source<T extends Prisma.PersonalContext$sourceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PersonalContext$sourceArgs<ExtArgs>>): Prisma.Prisma__SourceClient<runtime.Types.Result.GetResult<Prisma.$SourcePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   tasks<T extends Prisma.PersonalContext$tasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PersonalContext$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  aiInsights<T extends Prisma.PersonalContext$aiInsightsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PersonalContext$aiInsightsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AIInsightPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1793,6 +1908,30 @@ export type PersonalContext$tasksArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
+}
+
+/**
+ * PersonalContext.aiInsights
+ */
+export type PersonalContext$aiInsightsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AIInsight
+   */
+  select?: Prisma.AIInsightSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AIInsight
+   */
+  omit?: Prisma.AIInsightOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AIInsightInclude<ExtArgs> | null
+  where?: Prisma.AIInsightWhereInput
+  orderBy?: Prisma.AIInsightOrderByWithRelationInput | Prisma.AIInsightOrderByWithRelationInput[]
+  cursor?: Prisma.AIInsightWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AIInsightScalarFieldEnum | Prisma.AIInsightScalarFieldEnum[]
 }
 
 /**

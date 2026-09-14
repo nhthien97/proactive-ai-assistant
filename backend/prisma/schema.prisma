@@ -47,6 +47,7 @@ model PersonalContext {
   source   Source? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
 
   tasks Task[]
+  aiInsights AIInsight[]
 }
 
 model Task {
@@ -81,4 +82,22 @@ model Notification {
 
   taskId String?
   task   Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+}
+
+model AIInsight {
+  id             String   @id @default(cuid())
+  summary        String
+  category       String
+  importance     Int
+  confidence     Float?
+  needsAction    Boolean
+  actionType     String
+  suggestedTask  Json?
+  risk           String?
+  recommendation String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  contextId String
+  context   PersonalContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
 }

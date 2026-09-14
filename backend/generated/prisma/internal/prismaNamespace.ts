@@ -401,7 +401,8 @@ export const ModelName = {
   Source: 'Source',
   PersonalContext: 'PersonalContext',
   Task: 'Task',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  AIInsight: 'AIInsight'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "source" | "personalContext" | "task" | "notification"
+    modelProps: "user" | "source" | "personalContext" | "task" | "notification" | "aIInsight"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -791,6 +792,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AIInsight: {
+      payload: Prisma.$AIInsightPayload<ExtArgs>
+      fields: Prisma.AIInsightFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AIInsightFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AIInsightFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>
+        }
+        findFirst: {
+          args: Prisma.AIInsightFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AIInsightFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>
+        }
+        findMany: {
+          args: Prisma.AIInsightFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>[]
+        }
+        create: {
+          args: Prisma.AIInsightCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>
+        }
+        createMany: {
+          args: Prisma.AIInsightCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AIInsightCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>[]
+        }
+        delete: {
+          args: Prisma.AIInsightDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>
+        }
+        update: {
+          args: Prisma.AIInsightUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>
+        }
+        deleteMany: {
+          args: Prisma.AIInsightDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AIInsightUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AIInsightUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>[]
+        }
+        upsert: {
+          args: Prisma.AIInsightUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AIInsightPayload>
+        }
+        aggregate: {
+          args: Prisma.AIInsightAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAIInsight>
+        }
+        groupBy: {
+          args: Prisma.AIInsightGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AIInsightGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AIInsightCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AIInsightCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -896,12 +971,39 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const AIInsightScalarFieldEnum = {
+  id: 'id',
+  summary: 'summary',
+  category: 'category',
+  importance: 'importance',
+  confidence: 'confidence',
+  needsAction: 'needsAction',
+  actionType: 'actionType',
+  suggestedTask: 'suggestedTask',
+  risk: 'risk',
+  recommendation: 'recommendation',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  contextId: 'contextId'
+} as const
+
+export type AIInsightScalarFieldEnum = (typeof AIInsightScalarFieldEnum)[keyof typeof AIInsightScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -918,6 +1020,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -986,6 +1097,20 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 /**
@@ -1144,6 +1269,7 @@ export type GlobalOmitConfig = {
   personalContext?: Prisma.PersonalContextOmit
   task?: Prisma.TaskOmit
   notification?: Prisma.NotificationOmit
+  aIInsight?: Prisma.AIInsightOmit
 }
 
 /* Types for Logging */

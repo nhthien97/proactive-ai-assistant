@@ -66,3 +66,8 @@ export type Task = Prisma.TaskModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model AIInsight
+ * 
+ */
+export type AIInsight = Prisma.AIInsightModel
