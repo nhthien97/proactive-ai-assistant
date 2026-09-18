@@ -11,6 +11,10 @@ function App() {
   const [sources, setSources] = useState([]);
   const [aiInsights, setAiInsights] = useState([]);
 
+  const [dailyBriefing, setDailyBriefing] = useState(null);
+const [dailyBriefingLoading, setDailyBriefingLoading] = useState(false);
+const [dailyBriefingError, setDailyBriefingError] = useState("");
+
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -61,7 +65,33 @@ function App() {
 
   const user = users[0];
 
-  const pendingTasks = tasks.filter(
+useEffect(() => {
+  if (!user?.id) {
+    return;
+  }
+
+  const loadDailyBriefing = async () => {
+    try {
+      setDailyBriefingLoading(true);
+      setDailyBriefingError("");
+
+      const response = await api.get(
+        `/daily-briefing?userId=${user.id}`,
+      );
+
+      setDailyBriefing(response.data);
+    } catch (error) {
+      console.error("Failed to load Daily Briefing:", error);
+      setDailyBriefingError("Không thể tải Daily Briefing");
+    } finally {
+      setDailyBriefingLoading(false);
+    }
+  };
+
+  loadDailyBriefing();
+}, [user?.id]);
+
+const pendingTasks = tasks.filter(
     (task) => task.status !== "completed",
   ).length;
 
@@ -153,13 +183,14 @@ function App() {
           {/* TIÊU ĐỀ */}
           <div className="welcome">
             <div className="date-label">
-              {new Date().toLocaleDateString("vi-VN", {
-                weekday: "long",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              })}
-            </div>
+  {new Date().toLocaleDateString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })}
+</div>
 
             <h1>
               {user?.name ? `Xin chào, ${user.name}` : "Trợ lý AI chủ động"}
@@ -354,6 +385,237 @@ function App() {
               )}
             </form>
           </section>
+
+                    {/* DAILY BRIEFING */}
+          <section className="panel">
+            <div className="panel-header">
+              <div className="panel-title">Daily Briefing</div>
+
+              <div className="panel-subtitle">
+                Tổng hợp chủ động từ AI dựa trên công việc, thông báo và AI Insights
+              </div>
+            </div>
+
+            <div style={{ padding: "20px 22px" }}>
+              {dailyBriefingLoading && (
+                <div className="insight-description">
+                  AI đang tạo Daily Briefing...
+                </div>
+              )}
+
+              {dailyBriefingError && (
+                <div
+                  style={{
+                    color: "#b91c1c",
+                    fontSize: "14px",
+                  }}
+                >
+                  {dailyBriefingError}
+                </div>
+              )}
+
+              {!dailyBriefingLoading &&
+                !dailyBriefingError &&
+                dailyBriefing?.briefing && (
+                  <>
+                    <div
+                      style={{
+                        fontSize: "22px",
+                        fontWeight: "700",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {dailyBriefing.briefing.greeting}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "15px",
+                        lineHeight: "1.6",
+                        marginBottom: "20px",
+                        color: "#4b5563",
+                      }}
+                    >
+                      {dailyBriefing.briefing.summary}
+                    </div>
+
+                    {dailyBriefing.briefing.priorities?.length > 0 && (
+                      <div style={{ marginBottom: "20px" }}>
+                        <div
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: "700",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Việc cần ưu tiên
+                        </div>
+
+                        <div className="insights-list">
+                          {dailyBriefing.briefing.priorities.map(
+                            (priority, index) => (
+                              <div
+                                className="insight-item"
+                                key={`${priority.title}-${index}`}
+                              >
+                                <div className="insight-row">
+                                  <div className="insight-icon">
+                                    {priority.priority === "high"
+                                      ? "!"
+                                      : "•"}
+                                  </div>
+
+                                  <div className="insight-info">
+                                    <div className="insight-title">
+                                      {priority.title}
+                                    </div>
+
+                                    <div className="insight-description">
+                                      {priority.reason}
+                                    </div>
+
+                                    <div className="insight-description">
+                                      Mức độ ưu tiên: {priority.priority}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {dailyBriefing.briefing.upcomingTasks?.length > 0 && (
+                      <div style={{ marginBottom: "20px" }}>
+                        <div
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: "700",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Công việc sắp tới
+                        </div>
+
+                        <div className="insights-list">
+                          {dailyBriefing.briefing.upcomingTasks.map(
+                            (task, index) => (
+                              <div
+                                className="insight-item"
+                                key={`${task.title}-${index}`}
+                              >
+                                <div className="insight-row">
+                                  <div className="insight-icon">→</div>
+
+                                  <div className="insight-info">
+                                    <div className="insight-title">
+                                      {task.title}
+                                    </div>
+
+                                    <div className="insight-description">
+  {task.dueDate
+    ? `Hạn: ${new Date(task.dueDate).toLocaleString("vi-VN", {
+        timeZone: "Asia/Ho_Chi_Minh",
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })}`
+    : "Chưa có thời hạn"}
+</div>
+
+                                    <div className="insight-description">
+                                      Ưu tiên: {task.priority}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {dailyBriefing.briefing.alerts?.length > 0 && (
+                      <div style={{ marginBottom: "20px" }}>
+                        <div
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: "700",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Cảnh báo
+                        </div>
+
+                        <div className="insights-list">
+                          {dailyBriefing.briefing.alerts.map(
+                            (alert, index) => (
+                              <div
+                                className="insight-item"
+                                key={`${alert.title}-${index}`}
+                              >
+                                <div className="insight-row">
+                                  <div className="insight-icon">!</div>
+
+                                  <div className="insight-info">
+                                    <div className="insight-title">
+                                      {alert.title}
+                                    </div>
+
+                                    <div className="insight-description">
+                                      {alert.message}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {dailyBriefing.briefing.recommendations?.length > 0 && (
+                      <div>
+                        <div
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: "700",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Đề xuất của AI
+                        </div>
+
+                        <div className="insights-list">
+                          {dailyBriefing.briefing.recommendations.map(
+                            (recommendation, index) => (
+                              <div
+                                className="insight-item"
+                                key={`${recommendation}-${index}`}
+                              >
+                                <div className="insight-row">
+                                  <div className="insight-icon">AI</div>
+
+                                  <div className="insight-info">
+                                    <div className="insight-description">
+                                      {recommendation}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+            </div>
+          </section>
+
 
           <div className="dashboard-grid">
             {/* BỐI CẢNH */}

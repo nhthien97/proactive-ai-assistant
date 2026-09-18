@@ -5,6 +5,31 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
+async function generateBriefingWithRetry(prompt, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await ai.models.generateContent({
+        model: "gemini-3.6-flash",
+        contents: prompt,
+      });
+    } catch (error) {
+      const status = error?.status;
+
+      if (status !== 503 || attempt === maxRetries) {
+        throw error;
+      }
+
+      const delay = attempt * 2000;
+
+      console.warn(
+        `Gemini Daily Briefing returned 503. Retry ${attempt}/${maxRetries - 1} after ${delay}ms...`
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 export async function generateDailyBriefing(userId) {
   const [tasks, notifications, insights] = await Promise.all([
     prisma.task.findMany({
@@ -141,10 +166,7 @@ Quy tắc:
 - Chỉ trả về JSON.
 `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.6-flash",
-    contents: prompt,
-  });
+  const response = await generateBriefingWithRetry(prompt);
 
   const text = response.text?.trim();
 
