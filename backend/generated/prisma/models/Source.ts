@@ -182,8 +182,8 @@ export type SourceWhereInput = {
   name?: Prisma.StringFilter<"Source"> | string
   createdAt?: Prisma.DateTimeFilter<"Source"> | Date | string
   userId?: Prisma.StringFilter<"Source"> | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   contexts?: Prisma.PersonalContextListRelationFilter
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type SourceOrderByWithRelationInput = {
@@ -192,8 +192,8 @@ export type SourceOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   contexts?: Prisma.PersonalContextOrderByRelationAggregateInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type SourceWhereUniqueInput = Prisma.AtLeast<{
@@ -205,8 +205,8 @@ export type SourceWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Source"> | string
   createdAt?: Prisma.DateTimeFilter<"Source"> | Date | string
   userId?: Prisma.StringFilter<"Source"> | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   contexts?: Prisma.PersonalContextListRelationFilter
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type SourceOrderByWithAggregationInput = {
@@ -236,8 +236,8 @@ export type SourceCreateInput = {
   type: string
   name: string
   createdAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutSourcesInput
   contexts?: Prisma.PersonalContextCreateNestedManyWithoutSourceInput
+  user: Prisma.UserCreateNestedOneWithoutSourcesInput
 }
 
 export type SourceUncheckedCreateInput = {
@@ -254,8 +254,8 @@ export type SourceUpdateInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutSourcesNestedInput
   contexts?: Prisma.PersonalContextUpdateManyWithoutSourceNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutSourcesNestedInput
 }
 
 export type SourceUncheckedUpdateInput = {
@@ -555,8 +555,8 @@ export type SourceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name?: boolean
   createdAt?: boolean
   userId?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   contexts?: boolean | Prisma.Source$contextsArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SourceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["source"]>
 
@@ -588,8 +588,8 @@ export type SourceSelectScalar = {
 
 export type SourceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "name" | "createdAt" | "userId", ExtArgs["result"]["source"]>
 export type SourceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   contexts?: boolean | Prisma.Source$contextsArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SourceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SourceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -602,8 +602,8 @@ export type SourceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $SourcePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Source"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     contexts: Prisma.$PersonalContextPayload<ExtArgs>[]
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1005,8 +1005,8 @@ readonly fields: SourceFieldRefs;
  */
 export interface Prisma__SourceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   contexts<T extends Prisma.Source$contextsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Source$contextsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PersonalContextPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

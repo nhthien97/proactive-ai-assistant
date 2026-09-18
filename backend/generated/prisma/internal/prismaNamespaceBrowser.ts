@@ -56,7 +56,9 @@ export const ModelName = {
   PersonalContext: 'PersonalContext',
   Task: 'Task',
   Notification: 'Notification',
-  AIInsight: 'AIInsight'
+  AIInsight: 'AIInsight',
+  Feedback: 'Feedback',
+  ContextPreference: 'ContextPreference'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -121,7 +123,8 @@ export const TaskScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
-  contextId: 'contextId'
+  contextId: 'contextId',
+  aiInsightId: 'aiInsightId'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
@@ -135,7 +138,8 @@ export const NotificationScalarFieldEnum = {
   isRead: 'isRead',
   createdAt: 'createdAt',
   userId: 'userId',
-  taskId: 'taskId'
+  taskId: 'taskId',
+  aiInsightId: 'aiInsightId'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
@@ -158,6 +162,31 @@ export const AIInsightScalarFieldEnum = {
 } as const
 
 export type AIInsightScalarFieldEnum = (typeof AIInsightScalarFieldEnum)[keyof typeof AIInsightScalarFieldEnum]
+
+
+export const FeedbackScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  comment: 'comment',
+  createdAt: 'createdAt',
+  userId: 'userId',
+  aiInsightId: 'aiInsightId'
+} as const
+
+export type FeedbackScalarFieldEnum = (typeof FeedbackScalarFieldEnum)[keyof typeof FeedbackScalarFieldEnum]
+
+
+export const ContextPreferenceScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  content: 'content',
+  confidence: 'confidence',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type ContextPreferenceScalarFieldEnum = (typeof ContextPreferenceScalarFieldEnum)[keyof typeof ContextPreferenceScalarFieldEnum]
 
 
 export const SortOrder = {

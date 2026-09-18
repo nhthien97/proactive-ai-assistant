@@ -8,84 +8,79 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  contexts      PersonalContext[]
-  tasks         Task[]
+  id            String            @id @default(cuid())
+  email         String            @unique
+  name          String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
   notifications Notification[]
+  contexts      PersonalContext[]
   sources       Source[]
+  tasks         Task[]
+  feedbacks     Feedback[]
+  preferences   ContextPreference[]
 }
 
 model Source {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   type      String
   name      String
-  createdAt DateTime @default(now())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  contexts PersonalContext[]
+  createdAt DateTime          @default(now())
+  userId    String
+  contexts  PersonalContext[]
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PersonalContext {
-  id         String   @id @default(cuid())
+  id         String      @id @default(cuid())
   type       String
   content    String
-  importance Int      @default(1)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  sourceId String?
-  source   Source? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
-
-  tasks Task[]
+  importance Int         @default(1)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  userId     String
+  sourceId   String?
   aiInsights AIInsight[]
+  source     Source?     @relation(fields: [sourceId], references: [id])
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks      Task[]
 }
 
 model Task {
-  id          String    @id @default(cuid())
-  title       String
-  description String?
-  status      String    @default("pending")
-  priority    String    @default("medium")
-  dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  contextId String?
-  context   PersonalContext? @relation(fields: [contextId], references: [id], onDelete: SetNull)
-
+  id            String           @id @default(cuid())
+  title         String
+  description   String?
+  status        String           @default("pending")
+  priority      String           @default("medium")
+  dueDate       DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  userId        String
+  contextId     String?
+  aiInsightId   String?
   notifications Notification[]
+  aiInsight     AIInsight?       @relation(fields: [aiInsightId], references: [id])
+  context       PersonalContext? @relation(fields: [contextId], references: [id])
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  title     String
-  message   String
-  type      String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  taskId String?
-  task   Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  id          String     @id @default(cuid())
+  title       String
+  message     String
+  type        String
+  isRead      Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  userId      String
+  taskId      String?
+  aiInsightId String?
+  aiInsight   AIInsight? @relation(fields: [aiInsightId], references: [id])
+  task        Task?      @relation(fields: [taskId], references: [id])
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AIInsight {
-  id             String   @id @default(cuid())
+  id             String          @id @default(cuid())
   summary        String
   category       String
   importance     Int
@@ -95,9 +90,35 @@ model AIInsight {
   suggestedTask  Json?
   risk           String?
   recommendation String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  contextId      String
+  context        PersonalContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  notifications  Notification[]
+  tasks          Task[]
+  feedbacks      Feedback[]
+}
 
-  contextId String
-  context   PersonalContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
+model Feedback {
+  id          String     @id @default(cuid())
+  type        String
+  comment     String?
+  createdAt   DateTime   @default(now())
+  userId      String
+  aiInsightId String
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aiInsight   AIInsight  @relation(fields: [aiInsightId], references: [id], onDelete: Cascade)
+}
+
+model ContextPreference {
+  id         String   @id @default(cuid())
+  type       String
+  content    String
+  confidence Float?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

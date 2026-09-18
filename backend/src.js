@@ -1,15 +1,19 @@
 import express from "express";
 import cors from "cors";
 import prisma from "./src/prisma.js";
-import { GoogleGenAI } from "@google/genai";
+
 import "dotenv/config";
+import { processAIInsight } from "./src/services/actionEngine.js";
+import { getRecommendation } from "./src/services/recommendationEngine.js";
+import { analyzeContext } from "./src/services/aiAnalysisService.js";
+import { runProactiveScheduler } from "./src/services/proactiveScheduler.js";
+import { generateDailyBriefing } from "./src/services/dailyBriefingService.js";
+import { getFeedbackWithContext } from "./src/services/feedbackService.js";
+import { refineContextPreference } from "./src/services/feedbackRefinementService.js";
 
 const app = express();
 const PORT = 5000;
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
 
 app.use(cors());
 app.use(express.json());
@@ -93,6 +97,7 @@ app.post("/api/contexts", async (req, res) => {
       });
     }
 
+    // 1. Tạo PersonalContext
     const context = await prisma.personalContext.create({
       data: {
         type,
@@ -103,12 +108,24 @@ app.post("/api/contexts", async (req, res) => {
       },
     });
 
-    res.status(201).json(context);
-  } catch (error) {
-    console.error("Failed to create context:", error);
+    // 2. Trigger AI Analysis
+    const insight = await analyzeContext(context.id);
 
-    res.status(500).json({
-      message: "Failed to create context",
+    // 3. Trigger Action Engine
+    const actionResult = await processAIInsight(insight.id);
+
+    // 4. Trả toàn bộ kết quả của pipeline
+    return res.status(201).json({
+      context,
+      insight,
+      action: actionResult,
+    });
+  } catch (error) {
+    console.error("Proactive context processing error:", error);
+
+    return res.status(500).json({
+      message: "Failed to create and process context",
+      details: error.message,
     });
   }
 });
@@ -403,115 +420,19 @@ app.post("/api/ai/analyze-context", async (req, res) => {
       });
     }
 
-    // 1. Lấy PersonalContext từ PostgreSQL
-    const context = await prisma.personalContext.findUnique({
-      where: {
-        id: contextId,
-      },
-      include: {
-        source: true,
-      },
-    });
+    const insight = await analyzeContext(contextId);
 
-    if (!context) {
-      return res.status(404).json({
-        error: "Context not found",
-      });
-    }
-
-    // 2. Tạo prompt gửi cho Gemini
-    const prompt = `
-Bạn là AI phân tích ngữ cảnh cho một trợ lý AI cá nhân chủ động.
-
-Hãy phân tích PersonalContext sau:
-
-ID: ${context.id}
-Loại ngữ cảnh: ${context.type}
-Nội dung: ${context.content}
-Mức độ quan trọng: ${context.importance}/5
-Nguồn: ${context.source?.name || "Không xác định"}
-
-Hãy trả về DUY NHẤT một JSON hợp lệ theo cấu trúc:
-
-{
-  "summary": "Tóm tắt ngắn gọn ngữ cảnh",
-  "category": "schedule|task|deadline|reminder|information|other",
-  "importance": 1,
-  "needsAction": true,
-  "actionType": "task|notification|recommendation|none",
-  "suggestedTask": {
-    "title": "Tên công việc được đề xuất",
-    "description": "Mô tả công việc",
-    "priority": "low|medium|high",
-    "dueDate": null
-  },
-  "risk": null,
-  "recommendation": null
-}
-
-Quy tắc:
-- importance phải là số nguyên từ 1 đến 5.
-- needsAction là true hoặc false.
-- actionType chỉ được là: task, notification, recommendation hoặc none.
-- Nếu không cần tạo task thì suggestedTask phải là null.
-- Nếu không phát hiện rủi ro thì risk phải là null.
-- Nếu không có đề xuất thì recommendation phải là null.
-- Không thêm Markdown.
-- Không thêm Markdown code block.
-- Chỉ trả về JSON.
-`;
-
-    // 3. Gọi Gemini
-    const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
-      contents: prompt,
-    });
-
-    // 4. Lấy nội dung Gemini trả về
-    const text = response.text?.trim();
-
-    if (!text) {
-      return res.status(500).json({
-        error: "Gemini returned an empty response",
-      });
-    }
-
-    // 5. Parse JSON từ Gemini
-    let analysis;
-
-    try {
-      analysis = JSON.parse(text);
-    } catch (parseError) {
-      console.error("Failed to parse Gemini response:", text);
-
-      return res.status(500).json({
-        error: "Gemini returned invalid JSON",
-        rawResponse: text,
-      });
-    }
-
-    // 6. Lưu kết quả phân tích vào AIInsight
-    const insight = await prisma.aIInsight.create({
-      data: {
-        summary: analysis.summary,
-        category: analysis.category,
-        importance: analysis.importance,
-        confidence: analysis.confidence ?? null,
-        needsAction: analysis.needsAction,
-        actionType: analysis.actionType,
-        suggestedTask: analysis.suggestedTask ?? null,
-        risk: analysis.risk ?? null,
-        recommendation: analysis.recommendation ?? null,
-        contextId: context.id,
-      },
-    });
-
-    // 7. Trả AIInsight về frontend
     return res.status(201).json({
       insight,
     });
   } catch (error) {
     console.error("AI analysis error:", error);
+
+    if (error.message === "Context not found") {
+      return res.status(404).json({
+        error: "Context not found",
+      });
+    }
 
     return res.status(500).json({
       error: "Failed to analyze context",
@@ -520,7 +441,298 @@ Quy tắc:
   }
 });
 
+// =========================
+// PROACTIVE ACTION ENGINE
+// =========================
+app.post("/api/ai/process-insight", async (req, res) => {
+  try {
+    const { insightId } = req.body;
+
+    if (!insightId) {
+      return res.status(400).json({
+        error: "insightId is required",
+      });
+    }
+
+    const result = await processAIInsight(insightId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Action Engine error:", error);
+
+    return res.status(500).json({
+      error: "Failed to process AIInsight",
+      details: error.message,
+    });
+  }
+});
+
+// =========================
+// RECOMMENDATION ENGINE
+// =========================
+app.post("/api/ai/recommendation", async (req, res) => {
+  try {
+    const { insightId } = req.body;
+
+    if (!insightId) {
+      return res.status(400).json({
+        error: "insightId is required",
+      });
+    }
+
+    const result = await getRecommendation(insightId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Recommendation Engine error:", error);
+
+    return res.status(500).json({
+      error: "Failed to get recommendation",
+      details: error.message,
+    });
+  }
+});
+
+
+app.get("/api/daily-briefing", async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+      });
+    }
+
+    const result = await generateDailyBriefing(userId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Daily Briefing error:", error);
+
+    return res.status(500).json({
+      message: "Failed to generate Daily Briefing",
+      details: error.message,
+    });
+  }
+});
+
+app.post("/api/feedback", async (req, res) => {
+  try {
+    const { userId, aiInsightId, type, comment } = req.body;
+
+    if (!userId || !aiInsightId || !type) {
+      return res.status(400).json({
+        message: "userId, aiInsightId and type are required",
+      });
+    }
+
+    if (!["positive", "negative"].includes(type)) {
+      return res.status(400).json({
+        message: "type must be positive or negative",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const aiInsight = await prisma.aIInsight.findUnique({
+      where: { id: aiInsightId },
+    });
+
+    if (!aiInsight) {
+      return res.status(404).json({
+        message: "AIInsight not found",
+      });
+    }
+
+    const feedback = await prisma.feedback.create({
+      data: {
+        userId,
+        aiInsightId,
+        type,
+        comment: comment || null,
+      },
+    });
+
+    return res.status(201).json(feedback);
+  } catch (error) {
+    console.error("Create Feedback error:", error);
+
+    return res.status(500).json({
+      message: "Failed to create feedback",
+      details: error.message,
+    });
+  }
+});
+
+app.get("/api/feedback", async (req, res) => {
+  try {
+    const { userId, aiInsightId } = req.query;
+
+    const where = {};
+
+    if (userId) {
+      where.userId = userId;
+    }
+
+    if (aiInsightId) {
+      where.aiInsightId = aiInsightId;
+    }
+
+    const feedbacks = await prisma.feedback.findMany({
+      where,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res.status(200).json(feedbacks);
+  } catch (error) {
+    console.error("Get Feedback error:", error);
+
+    return res.status(500).json({
+      message: "Failed to get feedback",
+      details: error.message,
+    });
+  }
+});
+
+app.get("/api/feedback/:id/context", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await getFeedbackWithContext(id);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Get Feedback Context error:", error);
+
+    if (error.message === "Feedback not found") {
+      return res.status(404).json({
+        message: "Feedback not found",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to get feedback context",
+      details: error.message,
+    });
+  }
+});
+
+
+app.post("/api/feedback/:id/refine", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await refineContextPreference(id);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Refine Feedback error:", error);
+
+    if (error.message === "Feedback not found") {
+      return res.status(404).json({
+        message: "Feedback not found",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to refine feedback",
+      details: error.message,
+    });
+  }
+});
+
+
+// ============================================================
+// Context Preference API
+// ============================================================
+
+app.get("/api/preferences", async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const preferences = await prisma.contextPreference.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return res.status(200).json(preferences);
+  } catch (error) {
+    console.error("Get Preferences error:", error);
+
+    return res.status(500).json({
+      message: "Failed to get preferences",
+      details: error.message,
+    });
+  }
+});
+
+app.get("/api/preferences/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const preference = await prisma.contextPreference.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!preference) {
+      return res.status(404).json({
+        message: "Preference not found",
+      });
+    }
+
+    return res.status(200).json(preference);
+  } catch (error) {
+    console.error("Get Preference error:", error);
+
+    return res.status(500).json({
+      message: "Failed to get preference",
+      details: error.message,
+    });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
+
+  // Run once when backend starts
+  runProactiveScheduler();
+
+  // Run every 60 seconds
+  setInterval(() => {
+    runProactiveScheduler();
+  }, 60 * 1000);
 });

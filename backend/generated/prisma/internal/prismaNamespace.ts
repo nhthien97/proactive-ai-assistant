@@ -402,7 +402,9 @@ export const ModelName = {
   PersonalContext: 'PersonalContext',
   Task: 'Task',
   Notification: 'Notification',
-  AIInsight: 'AIInsight'
+  AIInsight: 'AIInsight',
+  Feedback: 'Feedback',
+  ContextPreference: 'ContextPreference'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "source" | "personalContext" | "task" | "notification" | "aIInsight"
+    modelProps: "user" | "source" | "personalContext" | "task" | "notification" | "aIInsight" | "feedback" | "contextPreference"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -866,6 +868,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Feedback: {
+      payload: Prisma.$FeedbackPayload<ExtArgs>
+      fields: Prisma.FeedbackFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FeedbackFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FeedbackFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>
+        }
+        findFirst: {
+          args: Prisma.FeedbackFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FeedbackFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>
+        }
+        findMany: {
+          args: Prisma.FeedbackFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>[]
+        }
+        create: {
+          args: Prisma.FeedbackCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>
+        }
+        createMany: {
+          args: Prisma.FeedbackCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FeedbackCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>[]
+        }
+        delete: {
+          args: Prisma.FeedbackDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>
+        }
+        update: {
+          args: Prisma.FeedbackUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>
+        }
+        deleteMany: {
+          args: Prisma.FeedbackDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FeedbackUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FeedbackUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>[]
+        }
+        upsert: {
+          args: Prisma.FeedbackUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeedbackPayload>
+        }
+        aggregate: {
+          args: Prisma.FeedbackAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFeedback>
+        }
+        groupBy: {
+          args: Prisma.FeedbackGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FeedbackGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FeedbackCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FeedbackCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContextPreference: {
+      payload: Prisma.$ContextPreferencePayload<ExtArgs>
+      fields: Prisma.ContextPreferenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContextPreferenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContextPreferenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>
+        }
+        findFirst: {
+          args: Prisma.ContextPreferenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContextPreferenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>
+        }
+        findMany: {
+          args: Prisma.ContextPreferenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>[]
+        }
+        create: {
+          args: Prisma.ContextPreferenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>
+        }
+        createMany: {
+          args: Prisma.ContextPreferenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContextPreferenceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>[]
+        }
+        delete: {
+          args: Prisma.ContextPreferenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>
+        }
+        update: {
+          args: Prisma.ContextPreferenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>
+        }
+        deleteMany: {
+          args: Prisma.ContextPreferenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContextPreferenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContextPreferenceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>[]
+        }
+        upsert: {
+          args: Prisma.ContextPreferenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextPreferencePayload>
+        }
+        aggregate: {
+          args: Prisma.ContextPreferenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContextPreference>
+        }
+        groupBy: {
+          args: Prisma.ContextPreferenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContextPreferenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContextPreferenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContextPreferenceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -951,7 +1101,8 @@ export const TaskScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
-  contextId: 'contextId'
+  contextId: 'contextId',
+  aiInsightId: 'aiInsightId'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
@@ -965,7 +1116,8 @@ export const NotificationScalarFieldEnum = {
   isRead: 'isRead',
   createdAt: 'createdAt',
   userId: 'userId',
-  taskId: 'taskId'
+  taskId: 'taskId',
+  aiInsightId: 'aiInsightId'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
@@ -988,6 +1140,31 @@ export const AIInsightScalarFieldEnum = {
 } as const
 
 export type AIInsightScalarFieldEnum = (typeof AIInsightScalarFieldEnum)[keyof typeof AIInsightScalarFieldEnum]
+
+
+export const FeedbackScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  comment: 'comment',
+  createdAt: 'createdAt',
+  userId: 'userId',
+  aiInsightId: 'aiInsightId'
+} as const
+
+export type FeedbackScalarFieldEnum = (typeof FeedbackScalarFieldEnum)[keyof typeof FeedbackScalarFieldEnum]
+
+
+export const ContextPreferenceScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  content: 'content',
+  confidence: 'confidence',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type ContextPreferenceScalarFieldEnum = (typeof ContextPreferenceScalarFieldEnum)[keyof typeof ContextPreferenceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1270,6 +1447,8 @@ export type GlobalOmitConfig = {
   task?: Prisma.TaskOmit
   notification?: Prisma.NotificationOmit
   aIInsight?: Prisma.AIInsightOmit
+  feedback?: Prisma.FeedbackOmit
+  contextPreference?: Prisma.ContextPreferenceOmit
 }
 
 /* Types for Logging */

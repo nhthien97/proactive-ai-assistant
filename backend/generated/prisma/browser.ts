@@ -47,3 +47,13 @@ export type Notification = Prisma.NotificationModel
  * 
  */
 export type AIInsight = Prisma.AIInsightModel
+/**
+ * Model Feedback
+ * 
+ */
+export type Feedback = Prisma.FeedbackModel
+/**
+ * Model ContextPreference
+ * 
+ */
+export type ContextPreference = Prisma.ContextPreferenceModel
