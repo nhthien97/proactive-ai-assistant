@@ -10,6 +10,16 @@ import { runProactiveScheduler } from "./src/services/proactiveScheduler.js";
 import { generateDailyBriefing } from "./src/services/dailyBriefingService.js";
 import { getFeedbackWithContext } from "./src/services/feedbackService.js";
 import { refineContextPreference } from "./src/services/feedbackRefinementService.js";
+import {
+  assertUserExists,
+  assertContextOwnership,
+  assertSourceOwnership,
+  assertTaskOwnership,
+  assertNotificationOwnership,
+  assertAIInsightOwnership,
+  assertFeedbackOwnership,
+  assertPreferenceOwnership,
+} from "./src/utils/ownership.js";
 
 const app = express();
 const PORT = 5000;
@@ -68,7 +78,20 @@ app.post("/api/users", async (req, res) => {
 
 app.get("/api/contexts", async (req, res) => {
   try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+      });
+    }
+
+    await assertUserExists(userId);
+
     const contexts = await prisma.personalContext.findMany({
+      where: {
+        userId,
+      },
       include: {
         source: true,
       },
@@ -81,8 +104,15 @@ app.get("/api/contexts", async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch contexts:", error);
 
+    if (error.message === "User not found") {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     res.status(500).json({
       message: "Failed to fetch contexts",
+      details: error.message,
     });
   }
 });
@@ -97,24 +127,26 @@ app.post("/api/contexts", async (req, res) => {
       });
     }
 
-    // 1. Tạo PersonalContext
+    await assertUserExists(userId);
+
+    if (sourceId) {
+      await assertSourceOwnership(sourceId, userId);
+    }
+
     const context = await prisma.personalContext.create({
       data: {
         type,
         content,
         importance: importance ?? 1,
         userId,
-        sourceId,
+        sourceId: sourceId ?? null,
       },
     });
 
-    // 2. Trigger AI Analysis
     const insight = await analyzeContext(context.id);
 
-    // 3. Trigger Action Engine
     const actionResult = await processAIInsight(insight.id);
 
-    // 4. Trả toàn bộ kết quả của pipeline
     return res.status(201).json({
       context,
       insight,
@@ -122,6 +154,18 @@ app.post("/api/contexts", async (req, res) => {
     });
   } catch (error) {
     console.error("Proactive context processing error:", error);
+
+    if (error.message === "User not found") {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (error.message === "Source not found or access denied") {
+      return res.status(403).json({
+        message: "Source does not belong to this user",
+      });
+    }
 
     return res.status(500).json({
       message: "Failed to create and process context",
@@ -140,6 +184,8 @@ app.post("/api/sources", async (req, res) => {
       });
     }
 
+    await assertUserExists(userId);
+
     const source = await prisma.source.create({
       data: {
         type,
@@ -152,15 +198,35 @@ app.post("/api/sources", async (req, res) => {
   } catch (error) {
     console.error("Failed to create source:", error);
 
+    if (error.message === "User not found") {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     res.status(500).json({
       message: "Failed to create source",
+      details: error.message,
     });
   }
 });
 
 app.get("/api/sources", async (req, res) => {
   try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+      });
+    }
+
+    await assertUserExists(userId);
+
     const sources = await prisma.source.findMany({
+      where: {
+        userId,
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -170,8 +236,15 @@ app.get("/api/sources", async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch sources:", error);
 
+    if (error.message === "User not found") {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     res.status(500).json({
       message: "Failed to fetch sources",
+      details: error.message,
     });
   }
 });
@@ -179,14 +252,26 @@ app.get("/api/sources", async (req, res) => {
 app.put("/api/contexts/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { sourceId } = req.body;
+    const { sourceId, userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+      });
+    }
+
+    await assertContextOwnership(id, userId);
+
+    if (sourceId) {
+      await assertSourceOwnership(sourceId, userId);
+    }
 
     const context = await prisma.personalContext.update({
       where: {
         id,
       },
       data: {
-        sourceId,
+        sourceId: sourceId ?? null,
       },
       include: {
         source: true,
@@ -197,15 +282,41 @@ app.put("/api/contexts/:id", async (req, res) => {
   } catch (error) {
     console.error("Failed to update context:", error);
 
+    if (error.message === "Context not found or access denied") {
+      return res.status(403).json({
+        message: "Context does not belong to this user",
+      });
+    }
+
+    if (error.message === "Source not found or access denied") {
+      return res.status(403).json({
+        message: "Source does not belong to this user",
+      });
+    }
+
     res.status(500).json({
       message: "Failed to update context",
+      details: error.message,
     });
   }
 });
 
 app.get("/api/tasks", async (req, res) => {
   try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+      });
+    }
+
+    await assertUserExists(userId);
+
     const tasks = await prisma.task.findMany({
+      where: {
+        userId,
+      },
       include: {
         context: true,
       },
@@ -218,8 +329,15 @@ app.get("/api/tasks", async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch tasks:", error);
 
+    if (error.message === "User not found") {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
     res.status(500).json({
       message: "Failed to fetch tasks",
+      details: error.message,
     });
   }
 });
@@ -242,6 +360,12 @@ app.post("/api/tasks", async (req, res) => {
       });
     }
 
+    await assertUserExists(userId);
+
+if (contextId) {
+  await assertContextOwnership(contextId, userId);
+}
+
     const task = await prisma.task.create({
       data: {
         title,
@@ -259,18 +383,38 @@ app.post("/api/tasks", async (req, res) => {
 
     res.status(201).json(task);
   } catch (error) {
-    console.error("Failed to create task:", error);
+  console.error("Failed to create task:", error);
 
-    res.status(500).json({
-      message: "Failed to create task",
+  if (error.message === "User not found") {
+    return res.status(404).json({
+      message: "User not found",
     });
   }
+
+  if (error.message === "Context not found or access denied") {
+    return res.status(403).json({
+      message: "Context does not belong to this user",
+    });
+  }
+
+  res.status(500).json({
+    message: "Failed to create task",
+    details: error.message,
+  });
+}
 });
 
 app.put("/api/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, priority } = req.body;
+    const { status, priority, userId } = req.body;
+    if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
+
+await assertTaskOwnership(id, userId);
 
     const task = await prisma.task.update({
       where: {
@@ -287,21 +431,41 @@ app.put("/api/tasks/:id", async (req, res) => {
 
     res.json(task);
   } catch (error) {
-    console.error("Failed to update task:", error);
+  console.error("Failed to update task:", error);
 
-    res.status(500).json({
-      message: "Failed to update task",
+  if (error.message === "Task not found or access denied") {
+    return res.status(403).json({
+      message: "Task does not belong to this user",
     });
   }
+
+  res.status(500).json({
+    message: "Failed to update task",
+    details: error.message,
+  });
+}
 });
 
 
 app.get("/api/notifications", async (req, res) => {
   try {
+    const { userId } = req.query;
+
+if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
+
+await assertUserExists(userId);
+
     const notifications = await prisma.notification.findMany({
-      include: {
-        task: true,
-      },
+  where: {
+    userId,
+  },
+  include: {
+    task: true,
+  },
       orderBy: {
         createdAt: "desc",
       },
@@ -310,6 +474,12 @@ app.get("/api/notifications", async (req, res) => {
     res.json(notifications);
   } catch (error) {
     console.error("Failed to fetch notifications:", error);
+
+    if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
 
     res.status(500).json({
       message: "Failed to fetch notifications",
@@ -326,6 +496,12 @@ app.post("/api/notifications", async (req, res) => {
         message: "title, message, type and userId are required",
       });
     }
+
+    await assertUserExists(userId);
+
+if (taskId) {
+  await assertTaskOwnership(taskId, userId);
+}
 
     const notification = await prisma.notification.create({
       data: {
@@ -344,6 +520,18 @@ app.post("/api/notifications", async (req, res) => {
   } catch (error) {
     console.error("Failed to create notification:", error);
 
+    if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
+
+if (error.message === "Task not found or access denied") {
+  return res.status(403).json({
+    message: "Task does not belong to this user",
+  });
+}
+
     res.status(500).json({
       message: "Failed to create notification",
     });
@@ -354,7 +542,15 @@ app.post("/api/notifications", async (req, res) => {
 app.put("/api/notifications/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { isRead } = req.body;
+const { isRead, userId } = req.body;
+
+if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
+
+await assertNotificationOwnership(id, userId);
 
     const notification = await prisma.notification.update({
       where: {
@@ -372,6 +568,12 @@ app.put("/api/notifications/:id", async (req, res) => {
   } catch (error) {
     console.error("Failed to update notification:", error);
 
+    if (error.message === "Notification not found or access denied") {
+  return res.status(403).json({
+    message: "Notification does not belong to this user",
+  });
+}
+
     res.status(500).json({
       message: "Failed to update notification",
     });
@@ -384,8 +586,22 @@ app.put("/api/notifications/:id", async (req, res) => {
 // =========================
 app.get("/api/ai/insights", async (req, res) => {
   try {
+    const { userId } = req.query;
+
+if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
+
+await assertUserExists(userId);
     const insights = await prisma.aIInsight.findMany({
-      include: {
+  where: {
+    context: {
+      userId,
+    },
+  },
+  include: {
         context: {
           include: {
             source: true,
@@ -401,6 +617,12 @@ app.get("/api/ai/insights", async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch AI insights:", error);
 
+    if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
+
     res.status(500).json({
       message: "Failed to fetch AI insights",
     });
@@ -412,7 +634,7 @@ app.get("/api/ai/insights", async (req, res) => {
 // =========================
 app.post("/api/ai/analyze-context", async (req, res) => {
   try {
-    const { contextId } = req.body;
+    const { contextId, userId } = req.body;
 
     if (!contextId) {
       return res.status(400).json({
@@ -420,12 +642,27 @@ app.post("/api/ai/analyze-context", async (req, res) => {
       });
     }
 
+    if (!userId) {
+  return res.status(400).json({
+    error: "userId is required",
+  });
+}
+
+await assertUserExists(userId);
+await assertContextOwnership(contextId, userId);
+
     const insight = await analyzeContext(contextId);
 
     return res.status(201).json({
       insight,
     });
   } catch (error) {
+
+    if (error.message === "Context not found or access denied") {
+  return res.status(403).json({
+    error: "Context does not belong to this user",
+  });
+}
     console.error("AI analysis error:", error);
 
     if (error.message === "Context not found") {
@@ -446,7 +683,7 @@ app.post("/api/ai/analyze-context", async (req, res) => {
 // =========================
 app.post("/api/ai/process-insight", async (req, res) => {
   try {
-    const { insightId } = req.body;
+    const { insightId, userId } = req.body;
 
     if (!insightId) {
       return res.status(400).json({
@@ -454,11 +691,26 @@ app.post("/api/ai/process-insight", async (req, res) => {
       });
     }
 
+    if (!userId) {
+  return res.status(400).json({
+    error: "userId is required",
+  });
+}
+
+await assertUserExists(userId);
+await assertAIInsightOwnership(insightId, userId);
+
     const result = await processAIInsight(insightId);
 
     return res.status(200).json(result);
   } catch (error) {
     console.error("Action Engine error:", error);
+
+    if (error.message === "AIInsight not found or access denied") {
+  return res.status(403).json({
+    error: "AIInsight does not belong to this user",
+  });
+}
 
     return res.status(500).json({
       error: "Failed to process AIInsight",
@@ -472,7 +724,7 @@ app.post("/api/ai/process-insight", async (req, res) => {
 // =========================
 app.post("/api/ai/recommendation", async (req, res) => {
   try {
-    const { insightId } = req.body;
+    const { insightId, userId } = req.body;
 
     if (!insightId) {
       return res.status(400).json({
@@ -480,11 +732,26 @@ app.post("/api/ai/recommendation", async (req, res) => {
       });
     }
 
+    if (!userId) {
+  return res.status(400).json({
+    error: "userId is required",
+  });
+}
+
+await assertUserExists(userId);
+await assertAIInsightOwnership(insightId, userId);
+
     const result = await getRecommendation(insightId);
 
     return res.status(200).json(result);
   } catch (error) {
     console.error("Recommendation Engine error:", error);
+
+    if (error.message === "AIInsight not found or access denied") {
+  return res.status(403).json({
+    error: "AIInsight does not belong to this user",
+  });
+}
 
     return res.status(500).json({
       error: "Failed to get recommendation",
@@ -504,11 +771,19 @@ app.get("/api/daily-briefing", async (req, res) => {
       });
     }
 
+    await assertUserExists(userId);
+
     const result = await generateDailyBriefing(userId);
 
     return res.status(200).json(result);
   } catch (error) {
     console.error("Daily Briefing error:", error);
+
+    if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
 
     return res.status(500).json({
       message: "Failed to generate Daily Briefing",
@@ -543,15 +818,7 @@ app.post("/api/feedback", async (req, res) => {
       });
     }
 
-    const aiInsight = await prisma.aIInsight.findUnique({
-      where: { id: aiInsightId },
-    });
-
-    if (!aiInsight) {
-      return res.status(404).json({
-        message: "AIInsight not found",
-      });
-    }
+    await assertAIInsightOwnership(aiInsightId, userId);
 
     const feedback = await prisma.feedback.create({
       data: {
@@ -566,6 +833,12 @@ app.post("/api/feedback", async (req, res) => {
   } catch (error) {
     console.error("Create Feedback error:", error);
 
+    if (error.message === "AIInsight not found or access denied") {
+  return res.status(403).json({
+    message: "AIInsight does not belong to this user",
+  });
+}
+
     return res.status(500).json({
       message: "Failed to create feedback",
       details: error.message,
@@ -577,15 +850,21 @@ app.get("/api/feedback", async (req, res) => {
   try {
     const { userId, aiInsightId } = req.query;
 
-    const where = {};
+if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
 
-    if (userId) {
-      where.userId = userId;
-    }
+await assertUserExists(userId);
 
-    if (aiInsightId) {
-      where.aiInsightId = aiInsightId;
-    }
+    const where = {
+  userId,
+};
+
+if (aiInsightId) {
+  where.aiInsightId = aiInsightId;
+}
 
     const feedbacks = await prisma.feedback.findMany({
       where,
@@ -598,6 +877,12 @@ app.get("/api/feedback", async (req, res) => {
   } catch (error) {
     console.error("Get Feedback error:", error);
 
+    if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
+
     return res.status(500).json({
       message: "Failed to get feedback",
       details: error.message,
@@ -608,12 +893,34 @@ app.get("/api/feedback", async (req, res) => {
 app.get("/api/feedback/:id/context", async (req, res) => {
   try {
     const { id } = req.params;
+const { userId } = req.query;
+
+if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
+
+await assertUserExists(userId);
+await assertFeedbackOwnership(id, userId);
 
     const result = await getFeedbackWithContext(id);
 
     return res.status(200).json(result);
   } catch (error) {
     console.error("Get Feedback Context error:", error);
+
+    if (error.message === "Feedback not found or access denied") {
+  return res.status(403).json({
+    message: "Feedback does not belong to this user",
+  });
+}
+
+if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
 
     if (error.message === "Feedback not found") {
       return res.status(404).json({
@@ -632,12 +939,34 @@ app.get("/api/feedback/:id/context", async (req, res) => {
 app.post("/api/feedback/:id/refine", async (req, res) => {
   try {
     const { id } = req.params;
+const { userId } = req.body;
+
+if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
+
+await assertUserExists(userId);
+await assertFeedbackOwnership(id, userId);
 
     const result = await refineContextPreference(id);
 
     return res.status(200).json(result);
   } catch (error) {
     console.error("Refine Feedback error:", error);
+
+    if (error.message === "Feedback not found or access denied") {
+  return res.status(403).json({
+    message: "Feedback does not belong to this user",
+  });
+}
+
+if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
 
     if (error.message === "Feedback not found") {
       return res.status(404).json({
@@ -686,9 +1015,21 @@ app.get("/api/preferences", async (req, res) => {
       },
     });
 
+    if (error.message === "Preference not found or access denied") {
+  return res.status(403).json({
+    message: "Preference does not belong to this user",
+  });
+}
+
     return res.status(200).json(preferences);
   } catch (error) {
     console.error("Get Preferences error:", error);
+
+if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
 
     return res.status(500).json({
       message: "Failed to get preferences",
@@ -700,22 +1041,39 @@ app.get("/api/preferences", async (req, res) => {
 app.get("/api/preferences/:id", async (req, res) => {
   try {
     const { id } = req.params;
+const { userId } = req.query;
 
-    const preference = await prisma.contextPreference.findUnique({
-      where: {
-        id,
-      },
-    });
+if (!userId) {
+  return res.status(400).json({
+    message: "userId is required",
+  });
+}
 
-    if (!preference) {
-      return res.status(404).json({
-        message: "Preference not found",
-      });
-    }
+await assertUserExists(userId);
 
-    return res.status(200).json(preference);
+await assertPreferenceOwnership(id, userId);
+
+return res.status(200).json(
+  await prisma.contextPreference.findUnique({
+    where: {
+      id,
+    },
+  })
+);
   } catch (error) {
     console.error("Get Preference error:", error);
+
+    if (error.message === "Preference not found or access denied") {
+  return res.status(403).json({
+    message: "Preference does not belong to this user",
+  });
+}
+
+if (error.message === "User not found") {
+  return res.status(404).json({
+    message: "User not found",
+  });
+}
 
     return res.status(500).json({
       message: "Failed to get preference",
