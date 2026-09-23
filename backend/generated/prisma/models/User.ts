@@ -188,6 +188,7 @@ export type UserWhereInput = {
   tasks?: Prisma.TaskListRelationFilter
   feedbacks?: Prisma.FeedbackListRelationFilter
   preferences?: Prisma.ContextPreferenceListRelationFilter
+  gmailConnection?: Prisma.XOR<Prisma.GmailConnectionNullableScalarRelationFilter, Prisma.GmailConnectionWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -202,6 +203,7 @@ export type UserOrderByWithRelationInput = {
   tasks?: Prisma.TaskOrderByRelationAggregateInput
   feedbacks?: Prisma.FeedbackOrderByRelationAggregateInput
   preferences?: Prisma.ContextPreferenceOrderByRelationAggregateInput
+  gmailConnection?: Prisma.GmailConnectionOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -219,6 +221,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   tasks?: Prisma.TaskListRelationFilter
   feedbacks?: Prisma.FeedbackListRelationFilter
   preferences?: Prisma.ContextPreferenceListRelationFilter
+  gmailConnection?: Prisma.XOR<Prisma.GmailConnectionNullableScalarRelationFilter, Prisma.GmailConnectionWhereInput> | null
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -255,6 +258,7 @@ export type UserCreateInput = {
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -269,6 +273,7 @@ export type UserUncheckedCreateInput = {
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceUncheckedCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -283,6 +288,7 @@ export type UserUpdateInput = {
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -297,6 +303,7 @@ export type UserUncheckedUpdateInput = {
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -448,6 +455,20 @@ export type UserUpdateOneRequiredWithoutPreferencesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPreferencesInput, Prisma.UserUpdateWithoutPreferencesInput>, Prisma.UserUncheckedUpdateWithoutPreferencesInput>
 }
 
+export type UserCreateNestedOneWithoutGmailConnectionInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGmailConnectionInput, Prisma.UserUncheckedCreateWithoutGmailConnectionInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGmailConnectionInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutGmailConnectionNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGmailConnectionInput, Prisma.UserUncheckedCreateWithoutGmailConnectionInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGmailConnectionInput
+  upsert?: Prisma.UserUpsertWithoutGmailConnectionInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGmailConnectionInput, Prisma.UserUpdateWithoutGmailConnectionInput>, Prisma.UserUncheckedUpdateWithoutGmailConnectionInput>
+}
+
 export type UserCreateWithoutSourcesInput = {
   id?: string
   email: string
@@ -459,6 +480,7 @@ export type UserCreateWithoutSourcesInput = {
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSourcesInput = {
@@ -472,6 +494,7 @@ export type UserUncheckedCreateWithoutSourcesInput = {
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceUncheckedCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSourcesInput = {
@@ -501,6 +524,7 @@ export type UserUpdateWithoutSourcesInput = {
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSourcesInput = {
@@ -514,6 +538,7 @@ export type UserUncheckedUpdateWithoutSourcesInput = {
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContextsInput = {
@@ -527,6 +552,7 @@ export type UserCreateWithoutContextsInput = {
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContextsInput = {
@@ -540,6 +566,7 @@ export type UserUncheckedCreateWithoutContextsInput = {
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceUncheckedCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContextsInput = {
@@ -569,6 +596,7 @@ export type UserUpdateWithoutContextsInput = {
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContextsInput = {
@@ -582,6 +610,7 @@ export type UserUncheckedUpdateWithoutContextsInput = {
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTasksInput = {
@@ -595,6 +624,7 @@ export type UserCreateWithoutTasksInput = {
   sources?: Prisma.SourceCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTasksInput = {
@@ -608,6 +638,7 @@ export type UserUncheckedCreateWithoutTasksInput = {
   sources?: Prisma.SourceUncheckedCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceUncheckedCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTasksInput = {
@@ -637,6 +668,7 @@ export type UserUpdateWithoutTasksInput = {
   sources?: Prisma.SourceUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTasksInput = {
@@ -650,6 +682,7 @@ export type UserUncheckedUpdateWithoutTasksInput = {
   sources?: Prisma.SourceUncheckedUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -663,6 +696,7 @@ export type UserCreateWithoutNotificationsInput = {
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -676,6 +710,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceUncheckedCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -705,6 +740,7 @@ export type UserUpdateWithoutNotificationsInput = {
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -718,6 +754,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFeedbacksInput = {
@@ -731,6 +768,7 @@ export type UserCreateWithoutFeedbacksInput = {
   sources?: Prisma.SourceCreateNestedManyWithoutUserInput
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFeedbacksInput = {
@@ -744,6 +782,7 @@ export type UserUncheckedCreateWithoutFeedbacksInput = {
   sources?: Prisma.SourceUncheckedCreateNestedManyWithoutUserInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.ContextPreferenceUncheckedCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFeedbacksInput = {
@@ -773,6 +812,7 @@ export type UserUpdateWithoutFeedbacksInput = {
   sources?: Prisma.SourceUpdateManyWithoutUserNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFeedbacksInput = {
@@ -786,6 +826,7 @@ export type UserUncheckedUpdateWithoutFeedbacksInput = {
   sources?: Prisma.SourceUncheckedUpdateManyWithoutUserNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.ContextPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPreferencesInput = {
@@ -799,6 +840,7 @@ export type UserCreateWithoutPreferencesInput = {
   sources?: Prisma.SourceCreateNestedManyWithoutUserInput
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPreferencesInput = {
@@ -812,6 +854,7 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   sources?: Prisma.SourceUncheckedCreateNestedManyWithoutUserInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPreferencesInput = {
@@ -841,6 +884,7 @@ export type UserUpdateWithoutPreferencesInput = {
   sources?: Prisma.SourceUpdateManyWithoutUserNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPreferencesInput = {
@@ -854,6 +898,79 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   sources?: Prisma.SourceUncheckedUpdateManyWithoutUserNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutGmailConnectionInput = {
+  id?: string
+  email: string
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  contexts?: Prisma.PersonalContextCreateNestedManyWithoutUserInput
+  sources?: Prisma.SourceCreateNestedManyWithoutUserInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
+  feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
+  preferences?: Prisma.ContextPreferenceCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutGmailConnectionInput = {
+  id?: string
+  email: string
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  contexts?: Prisma.PersonalContextUncheckedCreateNestedManyWithoutUserInput
+  sources?: Prisma.SourceUncheckedCreateNestedManyWithoutUserInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
+  feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.ContextPreferenceUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutGmailConnectionInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutGmailConnectionInput, Prisma.UserUncheckedCreateWithoutGmailConnectionInput>
+}
+
+export type UserUpsertWithoutGmailConnectionInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutGmailConnectionInput, Prisma.UserUncheckedUpdateWithoutGmailConnectionInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutGmailConnectionInput, Prisma.UserUncheckedCreateWithoutGmailConnectionInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutGmailConnectionInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutGmailConnectionInput, Prisma.UserUncheckedUpdateWithoutGmailConnectionInput>
+}
+
+export type UserUpdateWithoutGmailConnectionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  contexts?: Prisma.PersonalContextUpdateManyWithoutUserNestedInput
+  sources?: Prisma.SourceUpdateManyWithoutUserNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
+  feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.ContextPreferenceUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutGmailConnectionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  contexts?: Prisma.PersonalContextUncheckedUpdateManyWithoutUserNestedInput
+  sources?: Prisma.SourceUncheckedUpdateManyWithoutUserNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
+  feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.ContextPreferenceUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -944,6 +1061,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   tasks?: boolean | Prisma.User$tasksArgs<ExtArgs>
   feedbacks?: boolean | Prisma.User$feedbacksArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
+  gmailConnection?: boolean | Prisma.User$gmailConnectionArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -979,6 +1097,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   tasks?: boolean | Prisma.User$tasksArgs<ExtArgs>
   feedbacks?: boolean | Prisma.User$feedbacksArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
+  gmailConnection?: boolean | Prisma.User$gmailConnectionArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -993,6 +1112,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     tasks: Prisma.$TaskPayload<ExtArgs>[]
     feedbacks: Prisma.$FeedbackPayload<ExtArgs>[]
     preferences: Prisma.$ContextPreferencePayload<ExtArgs>[]
+    gmailConnection: Prisma.$GmailConnectionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1400,6 +1520,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   tasks<T extends Prisma.User$tasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   feedbacks<T extends Prisma.User$feedbacksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$feedbacksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   preferences<T extends Prisma.User$preferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContextPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  gmailConnection<T extends Prisma.User$gmailConnectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$gmailConnectionArgs<ExtArgs>>): Prisma.Prisma__GmailConnectionClient<runtime.Types.Result.GetResult<Prisma.$GmailConnectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1968,6 +2089,25 @@ export type User$preferencesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.ContextPreferenceScalarFieldEnum | Prisma.ContextPreferenceScalarFieldEnum[]
+}
+
+/**
+ * User.gmailConnection
+ */
+export type User$gmailConnectionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GmailConnection
+   */
+  select?: Prisma.GmailConnectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GmailConnection
+   */
+  omit?: Prisma.GmailConnectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GmailConnectionInclude<ExtArgs> | null
+  where?: Prisma.GmailConnectionWhereInput
 }
 
 /**

@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id            String            @id @default(cuid())
-  email         String            @unique
-  name          String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  notifications Notification[]
-  contexts      PersonalContext[]
-  sources       Source[]
-  tasks         Task[]
-  feedbacks     Feedback[]
-  preferences   ContextPreference[]
+  id              String              @id @default(cuid())
+  email           String              @unique
+  name            String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  notifications   Notification[]
+  contexts        PersonalContext[]
+  sources         Source[]
+  tasks           Task[]
+  feedbacks       Feedback[]
+  preferences     ContextPreference[]
+  gmailConnection GmailConnection?
 }
 
 model Source {
@@ -100,15 +101,15 @@ model AIInsight {
 }
 
 model Feedback {
-  id          String     @id @default(cuid())
+  id          String   @id @default(cuid())
   type        String
   comment     String?
-  createdAt   DateTime   @default(now())
+  createdAt   DateTime @default(now())
   userId      String
   aiInsightId String
 
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  aiInsight   AIInsight  @relation(fields: [aiInsightId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aiInsight AIInsight @relation(fields: [aiInsightId], references: [id], onDelete: Cascade)
 }
 
 model ContextPreference {
@@ -120,5 +121,21 @@ model ContextPreference {
   updatedAt  DateTime @updatedAt
   userId     String
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GmailConnection {
+  id            String    @id @default(cuid())
+  googleSubject String    @unique
+  googleEmail   String
+  accessToken   String?
+  refreshToken  String?
+  scope         String?
+  tokenType     String?
+  expiryDate    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  userId        String    @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

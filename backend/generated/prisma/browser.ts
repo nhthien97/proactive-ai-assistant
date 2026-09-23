@@ -57,3 +57,8 @@ export type Feedback = Prisma.FeedbackModel
  * 
  */
 export type ContextPreference = Prisma.ContextPreferenceModel
+/**
+ * Model GmailConnection
+ * 
+ */
+export type GmailConnection = Prisma.GmailConnectionModel

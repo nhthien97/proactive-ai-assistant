@@ -1,4 +1,5 @@
 import express from "express";
+import crypto from "node:crypto";
 import cors from "cors";
 import prisma from "./src/prisma.js";
 
@@ -10,6 +11,11 @@ import { runProactiveScheduler } from "./src/services/proactiveScheduler.js";
 import { generateDailyBriefing } from "./src/services/dailyBriefingService.js";
 import { getFeedbackWithContext } from "./src/services/feedbackService.js";
 import { refineContextPreference } from "./src/services/feedbackRefinementService.js";
+import {
+  getGoogleAuthorizationUrl,
+  exchangeGoogleCode,
+  getGoogleUserInfo,
+} from "./src/services/googleOAuthService.js";
 import {
   assertUserExists,
   assertContextOwnership,
@@ -23,6 +29,40 @@ import {
 
 const app = express();
 const PORT = 5000;
+
+const oauthStates = new Map();
+
+function createOAuthState() {
+  const state = crypto.randomBytes(32).toString("hex");
+
+  oauthStates.set(state, {
+    createdAt: Date.now(),
+  });
+
+  return state;
+}
+
+function consumeOAuthState(state) {
+  if (!state) {
+    return false;
+  }
+
+  const record = oauthStates.get(state);
+
+  if (!record) {
+    return false;
+  }
+
+  oauthStates.delete(state);
+
+  const maxAge = 10 * 60 * 1000;
+
+  if (Date.now() - record.createdAt > maxAge) {
+    return false;
+  }
+
+  return true;
+}
 
 
 app.use(cors());
@@ -1082,6 +1122,152 @@ if (error.message === "User not found") {
   }
 });
 
+
+
+app.get("/api/auth/google", (req, res) => {
+  try {
+    const state = createOAuthState();
+
+    const authorizationUrl = getGoogleAuthorizationUrl(state);
+
+    return res.redirect(authorizationUrl);
+  } catch (error) {
+    console.error("Google OAuth start error:", error);
+
+    return res.status(500).json({
+      message: "Failed to start Google OAuth",
+      details: error.message,
+    });
+  }
+});
+
+app.get("/api/auth/google/callback", async (req, res) => {
+  try {
+    const { code, state, error } = req.query;
+
+    if (error) {
+      return res.status(400).json({
+        message: "Google OAuth was denied or cancelled",
+        error,
+      });
+    }
+
+    if (!consumeOAuthState(state)) {
+      return res.status(400).json({
+        message: "Invalid or expired OAuth state",
+      });
+    }
+
+    if (!code) {
+      return res.status(400).json({
+        message: "Google authorization code is required",
+      });
+    }
+
+    const { tokens, oauth2Client } = await exchangeGoogleCode(code);
+
+    oauth2Client.setCredentials(tokens);
+
+    const googleUser = await getGoogleUserInfo(oauth2Client);
+
+if (!googleUser.id || !googleUser.email) {
+  return res.status(400).json({
+    message: "Google account information is incomplete",
+  });
+}
+
+// 1. Create or update the application user
+const user = await prisma.user.upsert({
+  where: {
+    email: googleUser.email,
+  },
+  update: {
+    name: googleUser.name ?? undefined,
+  },
+  create: {
+    email: googleUser.email,
+    name: googleUser.name ?? null,
+  },
+});
+
+// 2. Find existing Gmail connection by stable Google subject
+const existingConnection = await prisma.gmailConnection.findUnique({
+  where: {
+    googleSubject: googleUser.id,
+  },
+});
+
+// 3. Create or update Gmail connection
+const gmailConnection = existingConnection
+  ? await prisma.gmailConnection.update({
+      where: {
+        id: existingConnection.id,
+      },
+      data: {
+        googleEmail: googleUser.email,
+        accessToken: tokens.access_token ?? null,
+        refreshToken:
+          tokens.refresh_token ?? existingConnection.refreshToken,
+        scope: tokens.scope ?? existingConnection.scope,
+        tokenType: tokens.token_type ?? existingConnection.tokenType,
+        expiryDate: tokens.expiry_date
+          ? new Date(tokens.expiry_date)
+          : existingConnection.expiryDate,
+        userId: user.id,
+      },
+    })
+  : await prisma.gmailConnection.create({
+      data: {
+        googleSubject: googleUser.id,
+        googleEmail: googleUser.email,
+        accessToken: tokens.access_token ?? null,
+        refreshToken: tokens.refresh_token ?? null,
+        scope: tokens.scope ?? null,
+        tokenType: tokens.token_type ?? null,
+        expiryDate: tokens.expiry_date
+          ? new Date(tokens.expiry_date)
+          : null,
+        userId: user.id,
+      },
+    });
+
+    return res.status(200).json({
+  message: "Google OAuth successful",
+  user: {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+  },
+  gmailConnection: {
+    id: gmailConnection.id,
+    googleEmail: gmailConnection.googleEmail,
+    scope: gmailConnection.scope,
+    tokenType: gmailConnection.tokenType,
+    expiryDate: gmailConnection.expiryDate,
+  },
+  googleUser: {
+    id: googleUser.id,
+    email: googleUser.email,
+    name: googleUser.name,
+    picture: googleUser.picture,
+  },
+  tokenInfo: {
+    hasAccessToken: Boolean(tokens.access_token),
+    hasRefreshToken: Boolean(tokens.refresh_token),
+    scope: tokens.scope ?? null,
+    tokenType: tokens.token_type ?? null,
+    expiryDate: tokens.expiry_date ?? null,
+  },
+});
+  } catch (error) {
+    console.error("Google OAuth callback error:", error);
+
+    return res.status(500).json({
+      message: "Google OAuth callback failed",
+      details: error.message,
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);

@@ -58,7 +58,8 @@ export const ModelName = {
   Notification: 'Notification',
   AIInsight: 'AIInsight',
   Feedback: 'Feedback',
-  ContextPreference: 'ContextPreference'
+  ContextPreference: 'ContextPreference',
+  GmailConnection: 'GmailConnection'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -187,6 +188,23 @@ export const ContextPreferenceScalarFieldEnum = {
 } as const
 
 export type ContextPreferenceScalarFieldEnum = (typeof ContextPreferenceScalarFieldEnum)[keyof typeof ContextPreferenceScalarFieldEnum]
+
+
+export const GmailConnectionScalarFieldEnum = {
+  id: 'id',
+  googleSubject: 'googleSubject',
+  googleEmail: 'googleEmail',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  scope: 'scope',
+  tokenType: 'tokenType',
+  expiryDate: 'expiryDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type GmailConnectionScalarFieldEnum = (typeof GmailConnectionScalarFieldEnum)[keyof typeof GmailConnectionScalarFieldEnum]
 
 
 export const SortOrder = {
